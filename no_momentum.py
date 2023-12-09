@@ -20,6 +20,7 @@ def initialize_weights(input_size, hidden_size, output_size):
     return weights_input_hidden, weights_hidden_output
 
 def train_neural_network(X, y, epochs, learning_rate, activasion, activasion_derivative):
+    print(f"Input size {X.shape[1]}")
     input_size = X.shape[1]
     hidden_size = 2
     output_size = 1
@@ -59,11 +60,12 @@ def predict(X, weights_input_hidden, weights_hidden_output, activation):
 
 
 if __name__ == "__main__":
+    # FIXME(11jolek11): Network is not calculating correct predictions
     # XOR
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     y = np.array([[0], [1], [1], [0]])
 
-    trained_weights_input_hidden, trained_weights_hidden_output = train_neural_network(X, y, epochs=100000, learning_rate=0.1, sigmoid, sigmoid_derivative)
+    trained_weights_input_hidden, trained_weights_hidden_output = train_neural_network(X, y, epochs=100000, learning_rate=0.1, activasion=sigmoid, activasion_derivative=sigmoid_derivative)
 
     test_input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     predictions = predict(test_input, trained_weights_input_hidden, trained_weights_hidden_output, sigmoid)
