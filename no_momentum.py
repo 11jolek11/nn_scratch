@@ -19,7 +19,7 @@ def initialize_weights(input_size, hidden_size, output_size):
     weights_hidden_output = 2 * np.random.random((hidden_size, output_size)) - 1
     return weights_input_hidden, weights_hidden_output
 
-def train_neural_network(X, y, epochs, learning_rate):
+def train_neural_network(X, y, epochs, learning_rate, activasion, activasion_derivative):
     input_size = X.shape[1]
     hidden_size = 2
     output_size = 1
@@ -29,17 +29,17 @@ def train_neural_network(X, y, epochs, learning_rate):
     for epoch in range(epochs):
         # Forward pass
         hidden_layer_input = np.dot(X, weights_input_hidden)
-        hidden_layer_output = sigmoid(hidden_layer_input)
+        hidden_layer_output = activasion(hidden_layer_input)
 
         output_layer_input = np.dot(hidden_layer_output, weights_hidden_output)
-        predicted_output = sigmoid(output_layer_input)
+        predicted_output = activasion(output_layer_input)
 
         # Backpropagation
         output_error = y - predicted_output
-        output_delta = output_error * sigmoid_derivative(predicted_output)
+        output_delta = output_error * activasion_derivative(predicted_output)
 
         hidden_layer_error = output_delta.dot(weights_hidden_output.T)
-        hidden_layer_delta = hidden_layer_error * sigmoid_derivative(hidden_layer_output)
+        hidden_layer_delta = hidden_layer_error * activasion_derivative(hidden_layer_output)
 
         # Update weights
         weights_hidden_output += learning_rate * hidden_layer_output.T.dot(output_delta)
@@ -48,12 +48,12 @@ def train_neural_network(X, y, epochs, learning_rate):
     return weights_input_hidden, weights_hidden_output
 
 
-def predict(X, weights_input_hidden, weights_hidden_output):
+def predict(X, weights_input_hidden, weights_hidden_output, activation):
     hidden_layer_input = np.dot(X, weights_input_hidden)
     hidden_layer_output = sigmoid(hidden_layer_input)
 
     output_layer_input = np.dot(hidden_layer_output, weights_hidden_output)
-    predicted_output = sigmoid(output_layer_input)
+    predicted_output = activation(output_layer_input)
 
     return predicted_output
 
@@ -63,9 +63,10 @@ if __name__ == "__main__":
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     y = np.array([[0], [1], [1], [0]])
 
-    trained_weights_input_hidden, trained_weights_hidden_output = train_neural_network(X, y, epochs=100000, learning_rate=0.1)
+    trained_weights_input_hidden, trained_weights_hidden_output = train_neural_network(X, y, epochs=100000, learning_rate=0.1, sigmoid, sigmoid_derivative)
 
     test_input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    predictions = predict(test_input, trained_weights_input_hidden, trained_weights_hidden_output)
+    predictions = predict(test_input, trained_weights_input_hidden, trained_weights_hidden_output, sigmoid)
 
     print(predictions)
+
