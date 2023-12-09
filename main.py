@@ -8,6 +8,15 @@
 import numpy as np
 
 
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    # Real derivative of sigmoid function is sigmoid(a) * (1 - sigmoid(a)) but here i will pass argumnt x
+    # as x = sigmoid(a)
+    return x * (1 - x)
+
+
 class Net:
     def __init__(self, input_size, hidden_size, output_size, activation, activation_derivative) -> None:
         np.random.seed(42)
@@ -49,19 +58,41 @@ class Net:
 
 
 class Teacher:
-    def __init__(self, model, learning_seq, ground_truth, max_epochs_number: int = 1000, lr: float = 0.001, size: tuple[int, int, int] = (2, 2, 1)):
+    def __init__(self, model:Net, learning_seq, validation_seq, ground_truth, max_epochs_number: int = 1000, lr: float = 0.1, size: tuple[int, int, int] = (2, 2, 1), stop_criteria=False):
         self.model = model
         self.learning_seq = learning_seq
+        self.validation_seq = validation_seq
         self.ground_truth = ground_truth
         self.max_epochs_number = max_epochs_number
         self.lr = lr
         self.size = size
-        # self.stop_criteria = 
+        self.stop_criteria = stop_criteria
 
-
-    def set_stop_criteria(self):
-        pass
+    def get_model(self):
+        return self.model
 
     def train(self):
-        pass
+        # TODO(11jolek11): Implement stop criterium
+        for epoch in range(self.max_epochs_number):
+            self.model.forward(self.learning_seq, self.ground_truth, self.lr)
+
+
+if __name__ == "__main__":
+    test_model = Net(2, 2, 1, sigmoid, sigmoid_derivative)
+
+    # XOR
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    y = np.array([[0], [1], [1], [0]])
+
+    test_input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+
+    test_teacher = Teacher(test_model, X, [], y, max_epochs_number=100000)
+
+    test_teacher.train()
+
+    trained_model = test_teacher.get_model()
+
+    predictions = trained_model.predict(X)
+
+    print(predictions)
 
