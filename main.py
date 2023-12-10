@@ -6,18 +6,15 @@
 
 
 import numpy as np
+from activation import relu_derivative, tanh
+from no_momentum import sigmoid, sigmoid_derivative
 import pandas as pd
 import copy
 import matplotlib.pyplot as plt
+from activation import *
 
 
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
 
-def sigmoid_derivative(x):
-    # Real derivative of sigmoid function is sigmoid(a) * (1 - sigmoid(a)) but here i will pass argumnt x
-    # as x = sigmoid(a)
-    return x * (1 - x)
 
 def mse(actual, predicted):
     return (actual - predicted) ** 2
@@ -58,12 +55,12 @@ class Net:
         self.weights_hidden_output += learning_rate * hidden_layer_output.T.dot(output_delta)
         self.weights_input_hidden += learning_rate * X.T.dot(hidden_layer_delta)
 
-    def predict(self, x):
+    def predict(self, x, activation):
         hidden_layer_input = np.dot(x, self.weights_input_hidden)
         hidden_layer_output = self.activation(hidden_layer_input)
 
         output_layer_input = np.dot(hidden_layer_output, self.weights_hidden_output)
-        predicted_output = self.activation(output_layer_input)
+        predicted_output = activation(output_layer_input)
 
         return predicted_output
 
@@ -106,12 +103,12 @@ class NetMomentum:
         self.weights_hidden_output += self.momentum_weights_hidden_output
         self.weights_input_hidden += self.momentum_weights_input_hidden
 
-    def predict(self, x):
+    def predict(self, x, activation):
         hidden_layer_input = np.dot(x, self.weights_input_hidden)
         hidden_layer_output = self.activation(hidden_layer_input)
 
         output_layer_input = np.dot(hidden_layer_output, self.weights_hidden_output)
-        predicted_output = self.activation(output_layer_input)
+        predicted_output = activation(output_layer_input)
 
         return predicted_output
 
@@ -145,7 +142,7 @@ class Teacher:
 
             model = copy.copy(self.model)
 
-            error = mse(self.ground_truth, model.predict(self.learning_seq))
+            error = mse(self.ground_truth, model.predict(self.learning_seq, sigmoid))
 
             error_history.append(np.mean(error))
 
@@ -163,21 +160,21 @@ class Teacher:
         print(f"{len(error_history)}")
 
 if __name__ == "__main__":
-    test_model = Net(2, 2, 1, sigmoid, sigmoid_derivative)
-    # test_model = NetMomentum(2, 2, 1, sigmoid, sigmoid_derivative)
+    # test_model = Net(2, 2, 1, sigmoid, sigmoid_derivative)
+    test_model = NetMomentum(2, 2, 1, sigmoid, sigmoid_derivative)
     # XOR
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     y = np.array([[0], [1], [1], [0]])
 
     test_input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
 
-    test_teacher = Teacher(test_model, X, [], y, None, max_epochs_number=100000)
+    test_teacher = Teacher(test_model, X, [], y, None, max_epochs_number=10000)
 
     test_teacher.train()
 
     trained_model = test_teacher.get_model()
 
-    predictions = trained_model.predict(X)
+    predictions = trained_model.predict(X, tanh)
 
     print(predictions)
 
