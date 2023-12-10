@@ -6,6 +6,9 @@
 
 
 import numpy as np
+import pandas as pd
+import copy
+import matplotlib.pyplot as plt
 
 
 def sigmoid(x):
@@ -15,6 +18,12 @@ def sigmoid_derivative(x):
     # Real derivative of sigmoid function is sigmoid(a) * (1 - sigmoid(a)) but here i will pass argumnt x
     # as x = sigmoid(a)
     return x * (1 - x)
+
+def mse(actual, predicted):
+    return (actual - predicted) ** 2
+
+def mse_grad(actual, predicted):
+    return predicted - actual
 
 
 class Net:
@@ -39,6 +48,7 @@ class Net:
 
         # Backpropagation
         output_error = y - predicted_output
+        # output_error = predicted_output - y
         output_delta = output_error * self.activation_derivative(predicted_output)
 
         hidden_layer_error = output_delta.dot(self.weights_hidden_output.T)
@@ -107,7 +117,7 @@ class NetMomentum:
 
 
 class Teacher:
-    def __init__(self, model:Net | NetMomentum, learning_seq, validation_seq, ground_truth, momentum=0.9, max_epochs_number: int = 1000, lr: float = 0.1, size: tuple[int, int, int] = (2, 2, 1), stop_criteria=False):
+    def __init__(self, model:Net | NetMomentum, learning_seq, validation_seq, ground_truth, error_function, momentum=0.9, max_epochs_number: int = 1000, lr: float = 0.1, size: tuple[int, int, int] = (2, 2, 1), stop_criteria=lambda _: (False, None)):
         self.model = model
         self.learning_seq = learning_seq
         self.validation_seq = validation_seq
@@ -117,26 +127,51 @@ class Teacher:
         self.size = size
         self.stop_criteria = stop_criteria
         self.momentum = momentum
+        self.error_function = error_function
 
     def get_model(self):
         return self.model
 
     def train(self):
+        train_history = pd.DataFrame(columns=["model", "epoch", "error"])
+        model = None
+        error_history = []
         # TODO(11jolek11): Implement stop criterium
         for epoch in range(self.max_epochs_number):
-            self.model.forward(self.learning_seq, self.ground_truth, self.lr, self.momentum)
+            if isinstance(self.model, NetMomentum):
+                self.model.forward(self.learning_seq, self.ground_truth, self.lr, self.momentum)
+            if isinstance(self.model, Net):
+                self.model.forward(self.learning_seq, self.ground_truth, self.lr)
 
+            model = copy.copy(self.model)
+
+            error = mse(self.ground_truth, model.predict(self.learning_seq))
+
+            error_history.append(np.mean(error))
+
+            temp_dict = {"model": model, "epoch": epoch, "error": error}
+
+            train_history._append(temp_dict, ignore_index=True)
+
+            temp = self.stop_criteria(train_history)
+            if temp[0]:
+                 self.model = temp[1]
+                 break
+        plt.plot(error_history)
+        plt.show()
+
+        print(f"{len(error_history)}")
 
 if __name__ == "__main__":
-    # test_model = Net(2, 2, 1, sigmoid, sigmoid_derivative)
-    test_model = NetMomentum(2, 2, 1, sigmoid, sigmoid_derivative)
+    test_model = Net(2, 2, 1, sigmoid, sigmoid_derivative)
+    # test_model = NetMomentum(2, 2, 1, sigmoid, sigmoid_derivative)
     # XOR
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     y = np.array([[0], [1], [1], [0]])
 
     test_input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
 
-    test_teacher = Teacher(test_model, X, [], y, max_epochs_number=100000)
+    test_teacher = Teacher(test_model, X, [], y, None, max_epochs_number=100000)
 
     test_teacher.train()
 
