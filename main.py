@@ -168,4 +168,3 @@ if __name__ == "__main__":
     predictions = trained_model.predict(test_input, sigmoid)
 
     print(predictions)
-
