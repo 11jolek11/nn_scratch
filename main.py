@@ -152,12 +152,12 @@ class Teacher:
 
 if __name__ == "__main__":
     # test_model = Net(2, 2, 1, sigmoid, sigmoid_derivative)
-    test_model = NetMomentum(2, 2, 1, sigmoid, sigmoid_derivative)
+    test_model = NetMomentum(2, 2, 1, tanh, tanh_derivative)
     # XOR
-    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    y = np.array([[0], [1], [1], [0]])
+    X = np.array([[-1, -1], [-1, 1], [1, -1], [1, 1]])
+    y = np.array([[-1], [1], [1], [-1]])
 
-    test_input = np.array([1, 0])
+    test_input = np.array([[-1, -1], [1, -1], [-1, 1], [1, 1]])
 
     test_teacher = Teacher(test_model, X, [], y, None, max_epochs_number=10000)
 
@@ -165,6 +165,6 @@ if __name__ == "__main__":
 
     trained_model = test_teacher.get_model()
 
-    predictions = trained_model.predict(test_input, sigmoid)
+    predictions = trained_model.predict(test_input, tanh)
 
     print(predictions)
