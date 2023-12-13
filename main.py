@@ -69,8 +69,8 @@ class NetMomentum:
     def __init__(self, input_size, hidden_size, output_size, activation, activation_derivative, debug=True) -> None:
         if debug:
             np.random.seed(42)
-        self.weights_input_hidden = 2 * np.random.random((input_size, hidden_size)) - 1
-        self.weights_hidden_output = 2 * np.random.random((hidden_size, output_size)) - 1
+        self.weights_input_hidden = 1 * np.random.random((input_size, hidden_size))
+        self.weights_hidden_output = 1 * np.random.random((hidden_size, output_size))
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     y = np.array([[0], [1], [1], [0]])
 
-    test_input = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    test_input = np.array([1, 1])
 
     test_teacher = Teacher(test_model, X, [], y, None, max_epochs_number=10000)
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
 
     trained_model = test_teacher.get_model()
 
-    predictions = trained_model.predict(X, tanh)
+    predictions = trained_model.predict(test_input, sigmoid)
 
     print(predictions)
 
