@@ -1,18 +1,9 @@
-# Pytania do dr Turowskiej
-#
-# - czy liczba neuronow ukrytych tez ma byc parametrem symluacji?
-# - Jak mamy przedstawic etapy uczenia sieci na wykresie?
-# - Co ma sie znalezdz w sprawku
-
-
 import numpy as np
-from activation import relu_derivative, tanh
-from no_momentum import sigmoid, sigmoid_derivative
+from activation import relu_derivative, tanh, sigmoid, sigmoid_derivative
 import pandas as pd
 import copy
 import matplotlib.pyplot as plt
 from activation import *
-
 
 
 
@@ -27,8 +18,8 @@ class Net:
     def __init__(self, input_size, hidden_size, output_size, activation, activation_derivative, debug=True) -> None:
         if debug:
             np.random.seed(42)
-        self.weights_input_hidden = 2 * np.random.random((input_size, hidden_size)) - 1
-        self.weights_hidden_output = 2 * np.random.random((hidden_size, output_size)) - 1
+        self.weights_input_hidden = 1 * np.random.random((input_size, hidden_size)) 
+        self.weights_hidden_output = 1 * np.random.random((hidden_size, output_size))
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -166,7 +157,7 @@ if __name__ == "__main__":
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     y = np.array([[0], [1], [1], [0]])
 
-    test_input = np.array([1, 1])
+    test_input = np.array([1, 0])
 
     test_teacher = Teacher(test_model, X, [], y, None, max_epochs_number=10000)
 
