@@ -1,4 +1,4 @@
-Neural Network from Scratch
+## Neural Network from Scratch
 This project implements a neural network from scratch to solve the XOR problem. The network demonstrates the capability to learn with and without momentum, offering flexibility in training approaches.
 Features
 
@@ -11,9 +11,7 @@ Choice of activation functions:
 * Rectified Linear Unit (ReLU)
 * Sigmoid
 
-
-
-Overview
+## Overview
 The XOR problem is a classic benchmark in neural network training, as it requires a multi-layer network to solve. This implementation showcases how a simple neural network can learn to correctly classify XOR inputs.
-Tech Stack
+## Tech Stack
 * Python
